@@ -1,0 +1,289 @@
+#!/bin/bash
+#NOTE PYTHON IS EXCLUDED FROM THE COMPILATION SYSTEM BECAUSE IT IS AN INTERPRETIVE LANGUAGE
+
+
+
+#Add new languages and compiler commands here to check for new ones.
+echo "Checking for existing compilers..."
+COMPILER_CHECK=(make javac g++ python gcc)
+LANG_CHECK=(Make Java C++ Python C)
+
+
+for (( i=0; i<"${#COMPILER_CHECK[@]}"; i++ ));
+do
+    COMPILE=$(which "${COMPILER_CHECK[${i}]}")
+    echo -n  "${LANG_CHECK[${i}]}..."
+    if [[ ${COMPILE} == */usr/bin/* ]]
+    then
+	echo "Yes"
+    else
+	echo "No"
+    fi
+done
+
+echo ""
+echo ""
+
+GEN_FILENAME=Makefile
+IFS='/' CURR_DIR=($PWD)
+CURRENT="${CURR_DIR[${#CURR_DIR[@]}-1]}"
+PROG=("${CURRENT}")
+
+len=`expr ${#CURR_DIR[@]}`-1 
+for (( i=3; i<${len}; i++ ));
+do
+    ABOVE_DIR+="/"
+    ABOVE_DIR+=${CURR_DIR[i]}
+done
+ABOVE_DIR+="/"
+
+
+
+
+#Generate the language directories
+IFS='
+' DIR_ARRAY=(`ls -l | grep '^d'`)
+for ((n=0; n<"${#DIR_ARRAY[@]}"; n++))
+do
+    IFS=' ' DIRECT=(${DIR_ARRAY[n]})
+    if [ "${DIRECT[${#DIRECT[@]}-1]}" != "pythonprogs" ]
+    then
+	LANG_DIRS+=(${DIRECT[${#DIRECT[@]}-1]})
+    fi
+done
+
+
+
+for ((i=0; i<"${#LANG_DIRS[@]}"; i++))
+do
+    IFS='
+' DIR_ARRAY=(`grep main ${LANG_DIRS[i]} -lR`)
+    for ((n=0; n<"${#DIR_ARRAY[@]}"; n++))
+    do
+	#DIFFERENT LANGUAGE STRUCTURES GO HERE. 
+        #Add LANGUAGENAME_DIRS as an elif statement to support the language.
+        #Also build a Makefile structure at the bottom of the file to support the language.
+	IFS='/' MAINS=(${DIR_ARRAY[n]})
+	if [ ${LANG_DIRS[i]} == "c++progs" ]
+	then
+	    CPLUSPLUS_MAINS+=( ${MAINS[${#MAINS[@]}-1]%.*})
+	    CPLUSPLUS_DIRS+=( ${MAINS[${#MAINS[@]}-2]})
+	elif [ ${LANG_DIRS[i]} == "javaprogs" ]
+	then
+	    JAVA_MAINS+=(${MAINS[${#MAINS[@]}-1]%.*})
+	    JAVA_DIRS+=( ${MAINS[${#MAINS[@]}-2]})
+	    #NEW_LANGUAGE_ADD_GOES_HERE_1
+	elif [ ${LANG_DIRS[i]} == "cprogs" ]
+	then
+	    C_MAINS+=( ${MAINS[${#MAINS[@]}-1]%.*})
+	    C_DIRS+=( ${MAINS[${#MAINS[@]}-2]})
+	fi
+    done
+done
+ 
+
+
+echo "Generating Makefiles...."
+
+rm -rf ~"${ABOVE_DIR}""${PROG}"/"${GEN_FILENAME}"
+echo ~"${ABOVE_DIR}""${PROG}"/"${GEN_FILENAME}"
+for LANGS in "${LANG_DIRS[@]}"
+do
+    rm -rf ~"${ABOVE_DIR}""${PROG}"/"${LANGS}"/"${GEN_FILENAME}"
+    echo ~"${ABOVE_DIR}""${PROG}"/"${LANGS}"/"${GEN_FILENAME}"
+    if [ ${LANGS} == "c++progs" ]
+    then
+	for PROGS in "${CPLUSPLUS_DIRS[@]}"
+	do
+	    rm -rf ~"${ABOVE_DIR}""${PROG}"/"${LANGS}"/"${PROGS}"/"${GEN_FILENAME}"
+	    echo ~"${ABOVE_DIR}""${PROG}"/"${LANGS}"/"${PROGS}"/"${GEN_FILENAME}"
+	done
+    elif [ ${LANGS} == "javaprogs"  ]
+    then
+	for PROGS in "${JAVA_DIRS[@]}"
+	do
+	    rm -rf ~"${ABOVE_DIR}""${PROG}"/"${LANGS}"/"${PROGS}"/"${GEN_FILENAME}"
+	    echo ~"${ABOVE_DIR}""${PROG}"/"${LANGS}"/"${PROGS}"/"${GEN_FILENAME}"
+	done
+	#NEW_LANGUAGE_ADD_GOES_HERE_2
+    elif [ ${LANGS} == "cprogs" ]
+    then
+	for PROGS in "${C_DIRS[@]}"
+	do
+	    rm -rf ~"${ABOVE_DIR}${PROG}"/"${LANGS}"/"${PROGS}"/"${GEN_FILENAME}"
+	    echo ~"${ABOVE_DIR}${PROG}"/"${LANGS}"/"${PROGS}"/"${GEN_FILENAME}"
+	done
+    fi
+done
+
+
+
+
+#MAKEFILE in programs/ directory
+for DIR in "${PROG[@]}"
+do
+echo -e "SUBDIRS = ${LANG_DIRS[@]}
+all: 
+\t@for progs in \$""{SUBDIRS} ; do \\
+\tcd \$$""{progs} ; \\
+\tmake ; \\
+\tcd .. ; \\
+done
+
+clean:
+\t@for progs in \$""{SUBDIRS} ; do \\
+\tcd \$$""{progs} ; \\
+\tmake clean ; \\
+\tcd .. ; \\
+done
+
+distclean:
+\t@for progs in \$""{SUBDIRS} ; do \\
+\tcd \$$""{progs} ; \\
+\tmake distclean ; \\
+\tcd .. ; \\
+done
+\trm -r -f "${GEN_FILENAME}"" > ${GEN_FILENAME}
+done
+
+
+
+
+
+#MAKEFILE in the different LANGUAGES Directories (c++progs javaprogs etc)
+for DIR in "${LANG_DIRS[@]}"
+do
+    #Add new different types of language directories here!
+    if [ "${DIR}" == "c++progs" ]
+    then
+	echo -e "SUBDIRS = ${CPLUSPLUS_DIRS[@]}" > ${DIR}/${GEN_FILENAME}
+    elif [ "${DIR}" == "javaprogs" ]
+    then
+	echo -e "SUBDIRS = ${JAVA_DIRS[@]}" > ${DIR}/${GEN_FILENAME}
+	#NEW_LANGUAGE_ADD_GOES_HERE_3
+    elif [ "${DIR}" == "cprogs" ]
+    then
+	echo -e "SUBDIRS = ${C_DIRS[@]}" > ${DIR}/${GEN_FILENAME}
+    fi
+echo -e "all: 
+\t@for progs in \$""{SUBDIRS} ; do \\
+\tcd \$$""{progs} ; \\
+\tmake ; \\
+\tcd .. ; \\
+done
+
+clean:
+\t@for progs in \$""{SUBDIRS} ; do \\
+\tcd \$$""{progs} ; \\
+\tmake clean ; \\
+\tcd .. ; \\
+done
+
+distclean:
+\t@for progs in \$""{SUBDIRS} ; do \\
+\tcd \$$""{progs} ; \\
+\tmake distclean ; \\
+\tcd .. ; \\
+done
+\trm -r -f "${GEN_FILENAME}"" >> ${DIR}/${GEN_FILENAME}
+done
+
+
+
+
+
+
+#MAKEFILE structure for C++ Programs
+for DIR in "${CPLUSPLUS_DIRS[@]}"
+do
+    for (( i=0; i<"${#CPLUSPLUS_DIRS[@]}"; i++ ))
+    do
+	if [ "${DIR}" == "${CPLUSPLUS_DIRS[${i}]}" ]
+	then
+	    echo -e "COMPILE = g++
+DEPEND = -o
+
+MAIN = ${CPLUSPLUS_MAINS[$i]}" > "c++progs"/${DIR}/${GEN_FILENAME}
+	fi
+    done
+
+echo -e "all:
+	\$""{COMPILE} \$""{MAIN}.cpp \$""{DEPEND} \$""{MAIN}
+
+clean:
+	rm -f \$""{MAIN}
+
+run:
+	@./\$""{MAIN}
+
+distclean:
+	rm -f \$""{MAIN}
+	rm -r -f "${GEN_FILENAME}"" >> "c++progs"/${DIR}/${GEN_FILENAME}
+done
+
+
+
+
+
+
+#MAKEFILE structure for JAVA Programs
+for DIR in "${JAVA_DIRS[@]}"
+do 
+    for ((x=0; x<"${#JAVA_DIRS[@]}"; x++))
+    do
+	if [ "${DIR}" == "${JAVA_DIRS[$x]}" ]
+	    then
+	    echo -e "COMPILE = javac
+DEPEND = -d
+CLASS_DIR = classes
+MAIN = ${JAVA_MAINS[$x]}" > "javaprogs"/${DIR}/${GEN_FILENAME}
+	fi
+    done
+echo -e "all:
+	mkdir -p \$""{CLASS_DIR}
+	\$""{COMPILE} \$""{DEPEND} \$""{CLASS_DIR} \$""{MAIN}.java
+
+clean:
+	rm -r -f \$""{CLASS_DIR}
+
+run:
+	@java -cp \$""{CLASS_DIR}/ \$""{MAIN}
+
+distclean:
+	rm -r -f \$""{CLASS_DIR}
+	rm -r -f "${GEN_FILENAME}"" >> "javaprogs"/${DIR}/${GEN_FILENAME}
+done
+
+
+
+
+
+
+#MAKEFILE structure for C Programs
+for DIR in "${C_DIRS[@]}"
+do
+    for (( i=0; i<"${#C_DIRS[@]}"; i++ ))
+    do
+	if [ "${DIR}" == "${C_DIRS[${i}]}" ]
+	then
+            echo -e "COMPILE = gcc
+DEPEND = -o
+MAIN = ${C_MAINS[$i]}" > "cprogs"/${DIR}/${GEN_FILENAME}
+        fi
+    done
+
+echo -e "all:
+	\$""{COMPILE} \$""{MAIN}.c \$""{DEPEND} \$""{MAIN}
+
+clean:
+	rm -f \$""{MAIN}
+
+run:
+	@./\$""{MAIN}
+
+
+distclean:
+	rm -r -f \$""{MAIN}
+	rm -r -f "${GEN_FILENAME}"" >> "cprogs"/${DIR}/${GEN_FILENAME}
+done
+

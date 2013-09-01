@@ -1,0 +1,129 @@
+#!/bin/bash
+
+read -p "Name of language to add/support: " LANG
+read -p "Compiler name of language (i.e. javac for Java): " COMPILER
+read -p "Flags for the compiler (i.e. -o for C/C++ Progs): " FLAGS
+read -p "Extension for the type of files (i.e. cpp for C++ ) (include dot): " EXTEN
+
+
+
+
+FILE_APPENDED=config_makefiles
+TEMP_FILE=config_makefiles1
+UPPER_LANG=`echo ${LANG} | tr [a-z] [A-Z]`
+LOWER_LANG=`echo ${LANG} | tr [A-Z] [a-z]`
+
+mkdir "${LOWER_LANG}""progs"
+
+PATTERN_1='#NEW_LANGUAGE_ADD_GOES_HERE_1'
+echo -e "\telif [ \${LANG_DIRS[i]} == \"${LOWER_LANG}progs\" ]
+\tthen
+\t    "${UPPER_LANG}"_MAINS+=( \${MAINS[\${#MAINS[@]}-1]%.*})
+\t    "${UPPER_LANG}"_DIRS+=( \${MAINS[\${#MAINS[@]}-2]})" > TEXT_INSERT
+
+sed -e "/${PATTERN_1}/r TEXT_INSERT" "${FILE_APPENDED}" >> ${TEMP_FILE}
+cat ${TEMP_FILE} > ${FILE_APPENDED}
+rm ${TEMP_FILE}
+
+
+
+
+
+
+
+PATTERN_2='#NEW_LANGUAGE_ADD_GOES_HERE_2'
+echo -e "    elif [ \${LANGS} == \"${LOWER_LANG}progs\" ]
+    then
+\tfor PROGS in \"\${"${UPPER_LANG}"_DIRS[@]}\"
+\tdo
+\t    rm -rf ~\"\${ABOVE_DIR}""\${PROG}\"/\"\${LANGS}\"/\"\${PROGS}\"/\"\${GEN_FILENAME}\"
+\t    echo ~\"\${ABOVE_DIR}""\${PROG}\"/\"\${LANGS}\"/\"\${PROGS}\"/\"\${GEN_FILENAME}\"
+\tdone" > TEXT_INSERT
+
+sed -e "/${PATTERN_2}/r TEXT_INSERT" "${FILE_APPENDED}" >> ${TEMP_FILE}
+cat ${TEMP_FILE} > ${FILE_APPENDED}
+rm ${TEMP_FILE}
+
+
+
+
+
+
+PATTERN_3='#NEW_LANGUAGE_ADD_GOES_HERE_3'
+echo -e "    elif [ \"\${DIR}\" == \"${LOWER_LANG}progs\" ]
+    then
+	echo -e \"SUBDIRS = \${"${UPPER_LANG}"_DIRS[@]}\" > \${DIR}/\${GEN_FILENAME}" > TEXT_INSERT
+sed -e "/${PATTERN_3}/r TEXT_INSERT" "${FILE_APPENDED}" >> ${TEMP_FILE}
+cat ${TEMP_FILE} > ${FILE_APPENDED}
+rm ${TEMP_FILE}
+
+
+
+
+
+echo -e "\n\n\n\n\n\n\n#MAKEFILE structure for "${UPPER_LANG}" Programs
+for DIR in \"\${"${UPPER_LANG}"_DIRS[@]}\"
+do
+    for (( i=0; i<\"\${#"${UPPER_LANG}"_DIRS[@]}\"; i++ ))
+    do
+	if [ \"\${DIR}\" == \"\${"${UPPER_LANG}"_DIRS[\${i}]}\" ]
+	then
+            echo -e \"COMPILE = "${COMPILER}"
+DEPEND = "${FLAGS}"
+MAIN = \${"${UPPER_LANG}"_MAINS[\$i]}\" > "\"${LOWER_LANG}"progs\"/\${DIR}/\${GEN_FILENAME}
+        fi
+    done
+
+echo -e \"all:
+\t\\$\"\"{COMPILE} \\$\"\"{MAIN}"${EXTEN}" \\$\"\"{DEPEND} \\$\"\"{MAIN}
+
+clean:
+\trm -f \\$\"\"{MAIN}
+
+run:
+\t@./\\$\"\"{MAIN}
+
+
+distclean:
+\trm -r -f \\$\"\"{MAIN}
+\trm -r -f \"\${GEN_FILENAME}\"\" >> \""${LOWER_LANG}"progs\"/\${DIR}/\${GEN_FILENAME}
+done
+" > TEXT_INSERT
+cat TEXT_INSERT >> ${FILE_APPENDED}
+
+
+rm -r TEXT_INSERT
+
+
+
+
+COMPILER_CHECKS=`grep "COMPILER_CHECK=" "${FILE_APPENDED}"`
+COMPILER_CHECKS=$(echo ${COMPILER_CHECKS:0:${#COMPILER_CHECKS}-1} "${COMPILER})")
+
+IFS=':' LINE_NUM=(`grep -n "COMPILER_CHECK=" ${FILE_APPENDED}`)
+sed "${LINE_NUM[0]}d" ${FILE_APPENDED}  > ${TEMP_FILE}
+cat ${TEMP_FILE} > ${FILE_APPENDED}
+
+sed "${LINE_NUM[0]}i${COMPILER_CHECKS}" ${FILE_APPENDED} > ${TEMP_FILE}
+cat ${TEMP_FILE} > ${FILE_APPENDED}
+
+
+
+
+LANG_CHECKS=`grep "LANG_CHECK=" "${FILE_APPENDED}"`
+LANG_CHECKS=$(echo ${LANG_CHECKS:0:${#LANG_CHECKS}-1} "${LANG})")
+
+IFS=':' LINE_NUM=(`grep -n "LANG_CHECK=" ${FILE_APPENDED}`)
+sed "${LINE_NUM[0]}d" ${FILE_APPENDED}  > ${TEMP_FILE}
+cat ${TEMP_FILE} > ${FILE_APPENDED}
+
+sed "${LINE_NUM[0]}i${LANG_CHECKS}" ${FILE_APPENDED} > ${TEMP_FILE}
+cat ${TEMP_FILE} > ${FILE_APPENDED}
+
+rm ${TEMP_FILE}
+
+
+
+echo ""
+echo "${LOWER_LANG}""progs/ directory has been created. "
+echo "Move your projects into that directory and run the config_makefiles script."
