@@ -1,0 +1,21 @@
+This system is good for compiling a wide variety of programs across a large specturm of languages. The script in this respoistory creates a series of Makefiles for specifically supported languages (currently only supports C, C++, and Java).
+
+It is very easily extendible in terms of adding extra languages to support, adding support for other languages requires only to run the support_new_languages script as well as to input the appriopriate answers to the script's questions.
+
+This program will check for specific existing compilers for a variety of languages and tell the user if those appropriate compilers exist or not. Then the program will generate the appropriate Makefiles for the current and lower directories.
+
+How to use this compilation system:
+
+1) Clone the repository using the 'git clone' command or download a zip from this page new the right portion of your screen.
+
+2) Once the repository is in a suitable directory, you can execute the script by this command: ./config_makefiles
+
+3) Output will check if specific compilers exist or not.
+
+4) Makefiles will be generated for the supported languages. (You must have 'make' installed on your system to run any of the afformentioned generated Makefiles, if you do not have 'make' installed, an command not found error will be thrown).
+
+5) 'make' command will compile current and lower directory programs 'make run' will run existing directory program for the supported languages 'make clean' will delete current and lower executable files for all supported languages 'make distclean' will perform 'make clean' functions as well as delete all current and lower Makefiles.
+
+NOTE: THE DIRECTORIES THAT HOLD THE LANGUAGE SPECIFIC PROGRAMS MUST NOT BE CHANGED. (aka the javaprogs/ cprogs/ and c++progs/ directories must not be modified in name)
+
+The example programs of java and c/c++ are just little test examples for helping test the boundries of the compile script.
