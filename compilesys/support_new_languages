@@ -1,5 +1,6 @@
 #!/bin/bash
 
+#Relevant Prompts
 read -p "Name of language to add/support: " LANG
 read -p "Compiler name of language (i.e. javac for Java): " COMPILER
 read -p "Flags for the compiler (i.e. -o for C/C++ Progs): " FLAGS
@@ -15,6 +16,7 @@ LOWER_LANG=`echo ${LANG} | tr [A-Z] [a-z]`
 
 mkdir "${LOWER_LANG}""progs"
 
+#Add first pattern
 PATTERN_1='#NEW_LANGUAGE_ADD_GOES_HERE_1'
 echo -e "\telif [ \${LANG_DIRS[i]} == \"${LOWER_LANG}progs\" ]
 \tthen
@@ -30,7 +32,7 @@ rm ${TEMP_FILE}
 
 
 
-
+#Add second pattern
 PATTERN_2='#NEW_LANGUAGE_ADD_GOES_HERE_2'
 echo -e "    elif [ \${LANGS} == \"${LOWER_LANG}progs\" ]
     then
@@ -48,7 +50,7 @@ rm ${TEMP_FILE}
 
 
 
-
+#Add third pattern
 PATTERN_3='#NEW_LANGUAGE_ADD_GOES_HERE_3'
 echo -e "    elif [ \"\${DIR}\" == \"${LOWER_LANG}progs\" ]
     then
@@ -60,7 +62,7 @@ rm ${TEMP_FILE}
 
 
 
-
+#Create appriopriate Makefile skeleton that will be used to generate the actual Makefiles for that language
 echo -e "\n\n\n\n\n\n\n#MAKEFILE structure for "${UPPER_LANG}" Programs
 for DIR in \"\${"${UPPER_LANG}"_DIRS[@]}\"
 do
@@ -96,10 +98,12 @@ rm -r TEXT_INSERT
 
 
 
-
+#Obtaiin array of compiler languages
 COMPILER_CHECKS=`grep "COMPILER_CHECK=" "${FILE_APPENDED}"`
+#Add the new language to the compiler languages array
 COMPILER_CHECKS=$(echo ${COMPILER_CHECKS:0:${#COMPILER_CHECKS}-1} "${COMPILER})")
 
+#Find the line number to write to and write the new array to the config file
 IFS=':' LINE_NUM=(`grep -n "COMPILER_CHECK=" ${FILE_APPENDED}`)
 sed "${LINE_NUM[0]}d" ${FILE_APPENDED}  > ${TEMP_FILE}
 cat ${TEMP_FILE} > ${FILE_APPENDED}
@@ -109,16 +113,37 @@ cat ${TEMP_FILE} > ${FILE_APPENDED}
 
 
 
-
+#Obtain array of languages
 LANG_CHECKS=`grep "LANG_CHECK=" "${FILE_APPENDED}"`
+#Add the new language to the language array
 LANG_CHECKS=$(echo ${LANG_CHECKS:0:${#LANG_CHECKS}-1} "${LANG})")
 
+#Find the line number to write to and write the new array to the config file.
 IFS=':' LINE_NUM=(`grep -n "LANG_CHECK=" ${FILE_APPENDED}`)
 sed "${LINE_NUM[0]}d" ${FILE_APPENDED}  > ${TEMP_FILE}
 cat ${TEMP_FILE} > ${FILE_APPENDED}
 
 sed "${LINE_NUM[0]}i${LANG_CHECKS}" ${FILE_APPENDED} > ${TEMP_FILE}
 cat ${TEMP_FILE} > ${FILE_APPENDED}
+
+
+
+
+
+#Obtain array of extensions for the languages
+EXTENSION_CHECKS=`grep "EXT_LANGS=" "${FILE_APPENDED}"`
+#Add the new extension to the extension language array
+EXTENSION_CHECKS=$(echo ${EXTENSION_CHECKS:0:${#EXTENSION_CHECKS}-1} "${EXTEN})")
+
+#Find the line number to write to and write the new array to the config file.
+IFS=':' LINE_NUM=(`grep -n "EXT_LANGS=" ${FILE_APPENDED}`)
+
+sed "${LINE_NUM[0]}d" ${FILE_APPENDED} > ${TEMP_FILE}
+cat ${TEMP_FILE} > ${FILE_APPENDED}
+
+sed "${LINE_NUM[0]}i${EXTENSION_CHECKS}" ${FILE_APPENDED} > ${TEMP_FILE}
+cat ${TEMP_FILE} > ${FILE_APPENDED}
+
 
 rm ${TEMP_FILE}
 

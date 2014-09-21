@@ -1,12 +1,36 @@
 #!/bin/bash
 #NOTE PYTHON IS EXCLUDED FROM THE COMPILATION SYSTEM BECAUSE IT IS AN INTERPRETIVE LANGUAGE
 
+#Checks if Makefiles are already made, if so, it deletes them so that the updated ones are created.
+CLEAR_MAKEFILES=`find ./Makefile`
+if [[ ${CLEAR_MAKEFILES} == "./Makefile" ]]
+then
+    make distclean > temp
+    rm -rf temp
+else
+    #Do Nothing
+    echo ""
+fi
 
 
 #Add new languages and compiler commands here to check for new ones.
 echo "Checking for existing compilers..."
-COMPILER_CHECK=(make javac g++ python gcc)
-LANG_CHECK=(Make Java C++ Python C)
+COMPILER_CHECK=(make javac g++ python gcc f77 cobc)
+LANG_CHECK=(Make Java C++ Python C Fortran Cobol)
+EXT_LANGS=(.java .cpp .c .f .cob)
+
+#Sort Function
+function mysort { 
+    for i in ${EXT_LANGS[@]}; 
+    do 
+	echo "$i";
+    done | sort -n 
+}
+
+LANGS_EXTENSIONS=( $(mysort) )
+
+
+
 
 
 for (( i=0; i<"${#COMPILER_CHECK[@]}"; i++ ));
@@ -52,12 +76,12 @@ do
     fi
 done
 
-
-
 for ((i=0; i<"${#LANG_DIRS[@]}"; i++))
 do
+
+    #THE VARIOUS LANGUAGES MUST HAVE THE WORD 'MAIN' IN THEM TO HAVE THE MAKEFILES SHOW UP IN THEIR DIRECTORIES
     IFS='
-' DIR_ARRAY=(`grep main ${LANG_DIRS[i]} -lR`)
+' DIR_ARRAY=(`grep '' ${LANG_DIRS[i]} -lR | grep ${LANGS_EXTENSIONS[i]}`)
     for ((n=0; n<"${#DIR_ARRAY[@]}"; n++))
     do
 	#DIFFERENT LANGUAGE STRUCTURES GO HERE. 
@@ -73,6 +97,14 @@ do
 	    JAVA_MAINS+=(${MAINS[${#MAINS[@]}-1]%.*})
 	    JAVA_DIRS+=( ${MAINS[${#MAINS[@]}-2]})
 	    #NEW_LANGUAGE_ADD_GOES_HERE_1
+	elif [ ${LANG_DIRS[i]} == "cobolprogs" ]
+	then
+	    COBOL_MAINS+=( ${MAINS[${#MAINS[@]}-1]%.*})
+	    COBOL_DIRS+=( ${MAINS[${#MAINS[@]}-2]})
+	elif [ ${LANG_DIRS[i]} == "fortranprogs" ]
+	then
+	    FORTRAN_MAINS+=( ${MAINS[${#MAINS[@]}-1]%.*})
+	    FORTRAN_DIRS+=( ${MAINS[${#MAINS[@]}-2]})
 	elif [ ${LANG_DIRS[i]} == "cprogs" ]
 	then
 	    C_MAINS+=( ${MAINS[${#MAINS[@]}-1]%.*})
@@ -80,8 +112,6 @@ do
 	fi
     done
 done
- 
-
 
 echo "Generating Makefiles...."
 
@@ -106,6 +136,20 @@ do
 	    echo ~"${ABOVE_DIR}""${PROG}"/"${LANGS}"/"${PROGS}"/"${GEN_FILENAME}"
 	done
 	#NEW_LANGUAGE_ADD_GOES_HERE_2
+    elif [ ${LANGS} == "cobolprogs" ]
+    then
+	for PROGS in "${COBOL_DIRS[@]}"
+	do
+	    rm -rf ~"${ABOVE_DIR}${PROG}"/"${LANGS}"/"${PROGS}"/"${GEN_FILENAME}"
+	    echo ~"${ABOVE_DIR}${PROG}"/"${LANGS}"/"${PROGS}"/"${GEN_FILENAME}"
+	done
+    elif [ ${LANGS} == "fortranprogs" ]
+    then
+	for PROGS in "${FORTRAN_DIRS[@]}"
+	do
+	    rm -rf ~"${ABOVE_DIR}${PROG}"/"${LANGS}"/"${PROGS}"/"${GEN_FILENAME}"
+	    echo ~"${ABOVE_DIR}${PROG}"/"${LANGS}"/"${PROGS}"/"${GEN_FILENAME}"
+	done
     elif [ ${LANGS} == "cprogs" ]
     then
 	for PROGS in "${C_DIRS[@]}"
@@ -161,6 +205,12 @@ do
     then
 	echo -e "SUBDIRS = ${JAVA_DIRS[@]}" > ${DIR}/${GEN_FILENAME}
 	#NEW_LANGUAGE_ADD_GOES_HERE_3
+    elif [ "${DIR}" == "cobolprogs" ]
+    then
+	echo -e "SUBDIRS = ${COBOL_DIRS[@]}" > ${DIR}/${GEN_FILENAME}
+    elif [ "${DIR}" == "fortranprogs" ]
+    then
+	echo -e "SUBDIRS = ${FORTRAN_DIRS[@]}" > ${DIR}/${GEN_FILENAME}
     elif [ "${DIR}" == "cprogs" ]
     then
 	echo -e "SUBDIRS = ${C_DIRS[@]}" > ${DIR}/${GEN_FILENAME}
@@ -285,5 +335,73 @@ run:
 distclean:
 	rm -r -f \$""{MAIN}
 	rm -r -f "${GEN_FILENAME}"" >> "cprogs"/${DIR}/${GEN_FILENAME}
+done
+
+
+
+
+
+
+#MAKEFILE structure for FORTRAN Programs
+for DIR in "${FORTRAN_DIRS[@]}"
+do
+    for (( i=0; i<"${#FORTRAN_DIRS[@]}"; i++ ))
+    do
+	if [ "${DIR}" == "${FORTRAN_DIRS[${i}]}" ]
+	then
+            echo -e "COMPILE = f77
+DEPEND = -o
+MAIN = ${FORTRAN_MAINS[$i]}" > "fortranprogs"/${DIR}/${GEN_FILENAME}
+        fi
+    done
+
+echo -e "all:
+	\$""{COMPILE} \$""{MAIN}.f \$""{DEPEND} \$""{MAIN}
+
+clean:
+	rm -f \$""{MAIN}
+
+run:
+	@./\$""{MAIN}
+
+
+distclean:
+	rm -r -f \$""{MAIN}
+	rm -r -f "${GEN_FILENAME}"" >> "fortranprogs"/${DIR}/${GEN_FILENAME}
+done
+
+
+
+
+
+
+
+
+#MAKEFILE structure for COBOL Programs
+for DIR in "${COBOL_DIRS[@]}"
+do
+    for (( i=0; i<"${#COBOL_DIRS[@]}"; i++ ))
+    do
+	if [ "${DIR}" == "${COBOL_DIRS[${i}]}" ]
+	then
+            echo -e "COMPILE = cobc
+DEPEND = -x
+MAIN = ${COBOL_MAINS[$i]}" > "cobolprogs"/${DIR}/${GEN_FILENAME}
+        fi
+    done
+
+echo -e "all:
+	\$""{COMPILE} \$""{DEPEND} \$""{MAIN}.cob
+
+clean:
+	rm -f \$""{MAIN}
+
+run:
+	@./\$""{MAIN}
+
+
+distclean:
+	rm -r -f \$""{MAIN}
+	rm -r -f "${GEN_FILENAME}"" >> "cobolprogs"/${DIR}/${GEN_FILENAME}
 done
 

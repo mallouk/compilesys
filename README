@@ -1,4 +1,4 @@
-This system is good for compiling a wide variety of programs across a large specturm of languages. The script in this respoistory creates a series of Makefiles for specifically supported languages (currently only supports C, C++, and Java).
+This system is good for compiling a wide variety of programs across a large specturm of languages. The script in this respoistory creates a series of Makefiles for specifically supported languages (currently only supports Fortran77, Cobol, C, C++, and Java).
 
 It is very easily extendible in terms of adding extra languages to support, adding support for other languages requires only to run the support_new_languages script as well as to input the appriopriate answers to the script's questions.
 
