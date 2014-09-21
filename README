@@ -2,11 +2,17 @@ This system is good for compiling a wide variety of programs across a large spec
 
 It is very easily extendible in terms of adding extra languages to support, adding support for other languages requires only to run the support_new_languages script as well as to input the appriopriate answers to the script's questions.
 
+The questions that the support_new_languages script will ask will require the user to know 4 things in this order:
+1) Name of language to support
+2) Name of the compiler for said language (e.i. javac for Java)
+3) Any particular flags for the compiler (such as -o for C/C++)
+4) Extension for the type of flies (i.e. .cpp for C++ files or .java for Java)
+
 This program will check for specific existing compilers for a variety of languages and tell the user if those appropriate compilers exist or not. Then the program will generate the appropriate Makefiles for the current and lower directories.
 
 How to use this compilation system:
 
-1) Clone the repository using the 'git clone' command or download a zip from this page new the right portion of your screen.
+1) Clone the repository using the 'git clone' command or download a zip from this page to the right portion of your screen.
 
 2) Once the repository is in a suitable directory, you can execute the script by this command: ./config_makefiles
 
