@@ -1,0 +1,55 @@
+#!/bin/bash
+
+EVERYTHING=("$@")
+JAVA_DIRS=()
+JAVA_MAINS=()
+GEN_FILENAME=()
+COUNTER=0
+
+for (( i=0; i<"${#EVERYTHING[@]}"; i++ ))
+do
+	if [[ "${EVERYTHING[${i}]}" != 0 && "${COUNTER}" == 0 ]]
+	then
+		JAVA_DIRS+=("${EVERYTHING[${i}]}")
+	elif [[ "${EVERYTHING[${i}]}" != 0 && "${COUNTER}" == 1 ]]
+	then
+		JAVA_MAINS+=("${EVERYTHING[${i}]}")
+	
+	elif [[ "${EVERYTHING[${i}]}" != 0 && "${COUNTER}" == 2 ]]
+	then
+		GEN_FILENAME+=("${EVERYTHING[${i}]}")
+	fi
+	if [[ "${EVERYTHING[${i}]}" == 0 ]]
+	then	
+		COUNTER=$((COUNTER+1))
+	fi
+done
+
+
+#MAKEFILE structure for JAVA Programs
+for DIR in "${JAVA_DIRS[@]}"
+do 
+    for ((x=0; x<"${#JAVA_DIRS[@]}"; x++))
+    do
+	if [ "${DIR}" == "${JAVA_DIRS[$x]}" ]
+	    then
+	    echo -e "COMPILE = javac
+DEPEND = -d
+CLASS_DIR = classes
+MAIN = ${JAVA_MAINS[$x]}" > "javaprogs"/${DIR}/${GEN_FILENAME}
+	fi
+    done
+echo -e "all:
+	mkdir -p \$""{CLASS_DIR}
+	\$""{COMPILE} \$""{DEPEND} \$""{CLASS_DIR} \$""{MAIN}.java
+
+clean:
+	rm -r -f \$""{CLASS_DIR}
+
+run:
+	@java -cp \$""{CLASS_DIR}/ \$""{MAIN}
+
+distclean:
+	rm -r -f \$""{CLASS_DIR}
+	rm -r -f "${GEN_FILENAME}"" >> "javaprogs"/${DIR}/${GEN_FILENAME}
+done

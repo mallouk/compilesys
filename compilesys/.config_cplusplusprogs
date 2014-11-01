@@ -1,0 +1,56 @@
+#!/bin/bash
+
+EVERYTHING=("$@")
+CPLUSPLUS_DIRS=()
+CPLUSPLUS_MAINS=()
+GEN_FILENAME=()
+COUNTER=0
+
+for (( i=0; i<"${#EVERYTHING[@]}"; i++ ))
+do
+	if [[ "${EVERYTHING[${i}]}" != 0 && "${COUNTER}" == 0 ]]
+	then
+		CPLUSPLUS_DIRS+=("${EVERYTHING[${i}]}")
+	elif [[ "${EVERYTHING[${i}]}" != 0 && "${COUNTER}" == 1 ]]
+	then
+		CPLUSPLUS_MAINS+=("${EVERYTHING[${i}]}")
+	
+	elif [[ "${EVERYTHING[${i}]}" != 0 && "${COUNTER}" == 2 ]]
+	then
+		GEN_FILENAME+=("${EVERYTHING[${i}]}")
+	fi
+	if [[ "${EVERYTHING[${i}]}" == 0 ]]
+	then	
+		COUNTER=$((COUNTER+1))
+	fi
+done
+
+
+
+#MAKEFILE structure for C++ Programs
+for DIR in "${CPLUSPLUS_DIRS[@]}"
+do
+    for (( i=0; i<"${#CPLUSPLUS_DIRS[@]}"; i++ ))
+    do
+	if [ "${DIR}" == "${CPLUSPLUS_DIRS[${i}]}" ]
+	then
+	    echo -e "COMPILE = g++
+DEPEND = -o
+
+MAIN = ${CPLUSPLUS_MAINS[$i]}" > "c++progs"/${DIR}/${GEN_FILENAME}
+	fi
+    done
+
+echo -e "all:
+	\$""{COMPILE} \$""{MAIN}.cpp \$""{DEPEND} \$""{MAIN}
+
+clean:
+	rm -f \$""{MAIN}
+
+run:
+	@./\$""{MAIN}
+
+distclean:
+	rm -f \$""{MAIN}
+	rm -r -f "${GEN_FILENAME}"" >> "c++progs"/${DIR}/${GEN_FILENAME}
+done

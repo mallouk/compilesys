@@ -2,14 +2,11 @@
 #NOTE PYTHON IS EXCLUDED FROM THE COMPILATION SYSTEM BECAUSE IT IS AN INTERPRETIVE LANGUAGE
 
 #Checks if Makefiles are already made, if so, it deletes them so that the updated ones are created.
-CLEAR_MAKEFILES=`find ./Makefile`
+CLEAR_MAKEFILES=`find -name Makefile | grep "\./Makefile"`
 if [[ ${CLEAR_MAKEFILES} == "./Makefile" ]]
 then
-    make distclean > temp
+    make distclean &> temp
     rm -rf temp
-else
-    #Do Nothing
-    echo ""
 fi
 
 
@@ -241,167 +238,13 @@ done
 
 
 
-
-
-#MAKEFILE structure for C++ Programs
-for DIR in "${CPLUSPLUS_DIRS[@]}"
-do
-    for (( i=0; i<"${#CPLUSPLUS_DIRS[@]}"; i++ ))
-    do
-	if [ "${DIR}" == "${CPLUSPLUS_DIRS[${i}]}" ]
-	then
-	    echo -e "COMPILE = g++
-DEPEND = -o
-
-MAIN = ${CPLUSPLUS_MAINS[$i]}" > "c++progs"/${DIR}/${GEN_FILENAME}
-	fi
-    done
-
-echo -e "all:
-	\$""{COMPILE} \$""{MAIN}.cpp \$""{DEPEND} \$""{MAIN}
-
-clean:
-	rm -f \$""{MAIN}
-
-run:
-	@./\$""{MAIN}
-
-distclean:
-	rm -f \$""{MAIN}
-	rm -r -f "${GEN_FILENAME}"" >> "c++progs"/${DIR}/${GEN_FILENAME}
-done
+./.config_cobolprogs "${COBOL_DIRS[@]}" 0 "${COBOL_MAINS[@]}" 0 "${GEN_FILENAME[@]}" 0 
+./.config_cprogs "${C_DIRS[@]}" 0 "${C_MAINS[@]}" 0 "${GEN_FILENAME[@]}" 0 
+./.config_cplusplusprogs "${CPLUSPLUS_DIRS[@]}" 0 "${CPLUSPLUS_MAINS[@]}" 0 "${GEN_FILENAME[@]}" 0 
+./.config_fortranprogs "${FORTRAN_DIRS[@]}" 0 "${FORTRAN_MAINS[@]}" 0 "${GEN_FILENAME[@]}" 0 
+./.config_javaprogs "${JAVA_DIRS[@]}" 0 "${JAVA_MAINS[@]}" 0 "${GEN_FILENAME[@]}" 0 
 
 
 
 
-
-
-#MAKEFILE structure for JAVA Programs
-for DIR in "${JAVA_DIRS[@]}"
-do 
-    for ((x=0; x<"${#JAVA_DIRS[@]}"; x++))
-    do
-	if [ "${DIR}" == "${JAVA_DIRS[$x]}" ]
-	    then
-	    echo -e "COMPILE = javac
-DEPEND = -d
-CLASS_DIR = classes
-MAIN = ${JAVA_MAINS[$x]}" > "javaprogs"/${DIR}/${GEN_FILENAME}
-	fi
-    done
-echo -e "all:
-	mkdir -p \$""{CLASS_DIR}
-	\$""{COMPILE} \$""{DEPEND} \$""{CLASS_DIR} \$""{MAIN}.java
-
-clean:
-	rm -r -f \$""{CLASS_DIR}
-
-run:
-	@java -cp \$""{CLASS_DIR}/ \$""{MAIN}
-
-distclean:
-	rm -r -f \$""{CLASS_DIR}
-	rm -r -f "${GEN_FILENAME}"" >> "javaprogs"/${DIR}/${GEN_FILENAME}
-done
-
-
-
-
-
-
-#MAKEFILE structure for C Programs
-for DIR in "${C_DIRS[@]}"
-do
-    for (( i=0; i<"${#C_DIRS[@]}"; i++ ))
-    do
-	if [ "${DIR}" == "${C_DIRS[${i}]}" ]
-	then
-            echo -e "COMPILE = gcc
-DEPEND = -o
-MAIN = ${C_MAINS[$i]}" > "cprogs"/${DIR}/${GEN_FILENAME}
-        fi
-    done
-
-echo -e "all:
-	\$""{COMPILE} \$""{MAIN}.c \$""{DEPEND} \$""{MAIN}
-
-clean:
-	rm -f \$""{MAIN}
-
-run:
-	@./\$""{MAIN}
-
-
-distclean:
-	rm -r -f \$""{MAIN}
-	rm -r -f "${GEN_FILENAME}"" >> "cprogs"/${DIR}/${GEN_FILENAME}
-done
-
-
-
-
-
-
-#MAKEFILE structure for FORTRAN Programs
-for DIR in "${FORTRAN_DIRS[@]}"
-do
-    for (( i=0; i<"${#FORTRAN_DIRS[@]}"; i++ ))
-    do
-	if [ "${DIR}" == "${FORTRAN_DIRS[${i}]}" ]
-	then
-            echo -e "COMPILE = f77
-DEPEND = -o
-MAIN = ${FORTRAN_MAINS[$i]}" > "fortranprogs"/${DIR}/${GEN_FILENAME}
-        fi
-    done
-
-echo -e "all:
-	\$""{COMPILE} \$""{MAIN}.f \$""{DEPEND} \$""{MAIN}
-
-clean:
-	rm -f \$""{MAIN}
-
-run:
-	@./\$""{MAIN}
-
-
-distclean:
-	rm -r -f \$""{MAIN}
-	rm -r -f "${GEN_FILENAME}"" >> "fortranprogs"/${DIR}/${GEN_FILENAME}
-done
-
-
-
-
-
-
-
-
-#MAKEFILE structure for COBOL Programs
-for DIR in "${COBOL_DIRS[@]}"
-do
-    for (( i=0; i<"${#COBOL_DIRS[@]}"; i++ ))
-    do
-	if [ "${DIR}" == "${COBOL_DIRS[${i}]}" ]
-	then
-            echo -e "COMPILE = cobc
-DEPEND = -x
-MAIN = ${COBOL_MAINS[$i]}" > "cobolprogs"/${DIR}/${GEN_FILENAME}
-        fi
-    done
-
-echo -e "all:
-	\$""{COMPILE} \$""{DEPEND} \$""{MAIN}.cob
-
-clean:
-	rm -f \$""{MAIN}
-
-run:
-	@./\$""{MAIN}
-
-
-distclean:
-	rm -r -f \$""{MAIN}
-	rm -r -f "${GEN_FILENAME}"" >> "cobolprogs"/${DIR}/${GEN_FILENAME}
-done
 

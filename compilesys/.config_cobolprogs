@@ -1,0 +1,56 @@
+#!/bin/bash
+
+EVERYTHING=("$@")
+COBOL_DIRS=()
+COBOL_MAINS=()
+GEN_FILENAME=()
+COUNTER=0
+
+for (( i=0; i<"${#EVERYTHING[@]}"; i++ ))
+do
+	if [[ "${EVERYTHING[${i}]}" != 0 && "${COUNTER}" == 0 ]]
+	then
+		COBOL_DIRS+=("${EVERYTHING[${i}]}")
+	elif [[ "${EVERYTHING[${i}]}" != 0 && "${COUNTER}" == 1 ]]
+	then
+		COBOL_MAINS+=("${EVERYTHING[${i}]}")
+	
+	elif [[ "${EVERYTHING[${i}]}" != 0 && "${COUNTER}" == 2 ]]
+	then
+		GEN_FILENAME+=("${EVERYTHING[${i}]}")
+	fi
+	if [[ "${EVERYTHING[${i}]}" == 0 ]]
+	then	
+		COUNTER=$((COUNTER+1))
+	fi
+done
+
+
+
+#MAKEFILE structure for COBOL Programs
+for DIR in "${COBOL_DIRS[@]}"
+do
+    for (( i=0; i<"${#COBOL_DIRS[@]}"; i++ ))
+    do
+	if [ "${DIR}" == "${COBOL_DIRS[${i}]}" ]
+	then
+            echo -e "COMPILE = cobc
+DEPEND = -x
+MAIN = ${COBOL_MAINS[$i]}" > "cobolprogs"/${DIR}/${GEN_FILENAME}
+        fi
+    done
+
+echo -e "all:
+	\$""{COMPILE} \$""{DEPEND} \$""{MAIN}.cob
+
+clean:
+	rm -f \$""{MAIN}
+
+run:
+	@./\$""{MAIN}
+
+
+distclean:
+	rm -r -f \$""{MAIN}
+	rm -r -f "${GEN_FILENAME}"" >> "cobolprogs"/${DIR}/${GEN_FILENAME}
+done

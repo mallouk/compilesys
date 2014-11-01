@@ -1,0 +1,55 @@
+#!/bin/bash
+
+EVERYTHING=("$@")
+FORTRAN_DIRS=()
+FORTRAN_MAINS=()
+GEN_FILENAME=()
+COUNTER=0
+
+for (( i=0; i<"${#EVERYTHING[@]}"; i++ ))
+do
+	if [[ "${EVERYTHING[${i}]}" != 0 && "${COUNTER}" == 0 ]]
+	then
+		FORTRAN_DIRS+=("${EVERYTHING[${i}]}")
+	elif [[ "${EVERYTHING[${i}]}" != 0 && "${COUNTER}" == 1 ]]
+	then
+		FORTRAN_MAINS+=("${EVERYTHING[${i}]}")
+	
+	elif [[ "${EVERYTHING[${i}]}" != 0 && "${COUNTER}" == 2 ]]
+	then
+		GEN_FILENAME+=("${EVERYTHING[${i}]}")
+	fi
+	if [[ "${EVERYTHING[${i}]}" == 0 ]]
+	then	
+		COUNTER=$((COUNTER+1))
+	fi
+done
+
+
+#MAKEFILE structure for FORTRAN Programs
+for DIR in "${FORTRAN_DIRS[@]}"
+do
+    for (( i=0; i<"${#FORTRAN_DIRS[@]}"; i++ ))
+    do
+	if [ "${DIR}" == "${FORTRAN_DIRS[${i}]}" ]
+	then
+            echo -e "COMPILE = f77
+DEPEND = -o
+MAIN = ${FORTRAN_MAINS[$i]}" > "fortranprogs"/${DIR}/${GEN_FILENAME}
+        fi
+    done
+
+echo -e "all:
+	\$""{COMPILE} \$""{MAIN}.f \$""{DEPEND} \$""{MAIN}
+
+clean:
+	rm -f \$""{MAIN}
+
+run:
+	@./\$""{MAIN}
+
+
+distclean:
+	rm -r -f \$""{MAIN}
+	rm -r -f "${GEN_FILENAME}"" >> "fortranprogs"/${DIR}/${GEN_FILENAME}
+done
