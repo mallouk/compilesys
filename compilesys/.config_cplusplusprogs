@@ -37,7 +37,7 @@ do
 	    echo -e "COMPILE = g++
 DEPEND = -o
 
-MAIN = ${CPLUSPLUS_MAINS[$i]}" > "c++progs"/${DIR}/${GEN_FILENAME}
+MAIN = ${CPLUSPLUS_MAINS[$i]}" > "cplusplus"/${DIR}/${GEN_FILENAME}
 	fi
     done
 
@@ -52,5 +52,5 @@ run:
 
 distclean:
 	rm -f \$""{MAIN}
-	rm -r -f "${GEN_FILENAME}"" >> "c++progs"/${DIR}/${GEN_FILENAME}
+	rm -r -f "${GEN_FILENAME}"" >> "cplusplus"/${DIR}/${GEN_FILENAME}
 done

@@ -35,7 +35,7 @@ do
 	then
             echo -e "COMPILE = gcc
 DEPEND = -o
-MAIN = ${C_MAINS[$i]}" > "cprogs"/${DIR}/${GEN_FILENAME}
+MAIN = ${C_MAINS[$i]}" > "c"/${DIR}/${GEN_FILENAME}
         fi
     done
 
@@ -51,5 +51,5 @@ run:
 
 distclean:
 	rm -r -f \$""{MAIN}
-	rm -r -f "${GEN_FILENAME}"" >> "cprogs"/${DIR}/${GEN_FILENAME}
+	rm -r -f "${GEN_FILENAME}"" >> "c"/${DIR}/${GEN_FILENAME}
 done

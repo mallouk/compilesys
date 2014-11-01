@@ -36,7 +36,7 @@ do
 	    echo -e "COMPILE = javac
 DEPEND = -d
 CLASS_DIR = classes
-MAIN = ${JAVA_MAINS[$x]}" > "javaprogs"/${DIR}/${GEN_FILENAME}
+MAIN = ${JAVA_MAINS[$x]}" > "java"/${DIR}/${GEN_FILENAME}
 	fi
     done
 echo -e "all:
@@ -51,5 +51,5 @@ run:
 
 distclean:
 	rm -r -f \$""{CLASS_DIR}
-	rm -r -f "${GEN_FILENAME}"" >> "javaprogs"/${DIR}/${GEN_FILENAME}
+	rm -r -f "${GEN_FILENAME}"" >> "java"/${DIR}/${GEN_FILENAME}
 done

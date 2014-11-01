@@ -16,15 +16,18 @@ COMPILER_CHECK=(make javac g++ python gcc f77 cobc)
 LANG_CHECK=(Make Java C++ Python C Fortran Cobol)
 EXT_LANGS=(.java .cpp .c .f .cob)
 
-#Sort Function
-function mysort { 
+#Sort extension languages Function
+function mysortLangExt { 
     for i in ${EXT_LANGS[@]}; 
     do 
 	echo "$i";
     done | sort -n 
 }
 
-LANGS_EXTENSIONS=( $(mysort) )
+
+
+
+LANGS_EXTENSIONS=( $(mysortLangExt) )
 
 
 
@@ -67,11 +70,12 @@ IFS='
 for ((n=0; n<"${#DIR_ARRAY[@]}"; n++))
 do
     IFS=' ' DIRECT=(${DIR_ARRAY[n]})
-    if [ "${DIRECT[${#DIRECT[@]}-1]}" != "pythonprogs" ]
+    if [ "${DIRECT[${#DIRECT[@]}-1]}" != "python" ]
     then
 	LANG_DIRS+=(${DIRECT[${#DIRECT[@]}-1]})
     fi
 done
+
 
 for ((i=0; i<"${#LANG_DIRS[@]}"; i++))
 do
@@ -85,24 +89,24 @@ do
         #Add LANGUAGENAME_DIRS as an elif statement to support the language.
         #Also build a Makefile structure at the bottom of the file to support the language.
 	IFS='/' MAINS=(${DIR_ARRAY[n]})
-	if [ ${LANG_DIRS[i]} == "c++progs" ]
+	if [ ${LANG_DIRS[i]} == "cplusplus" ]
 	then
 	    CPLUSPLUS_MAINS+=( ${MAINS[${#MAINS[@]}-1]%.*})
 	    CPLUSPLUS_DIRS+=( ${MAINS[${#MAINS[@]}-2]})
-	elif [ ${LANG_DIRS[i]} == "javaprogs" ]
+	elif [ ${LANG_DIRS[i]} == "java" ]
 	then
 	    JAVA_MAINS+=(${MAINS[${#MAINS[@]}-1]%.*})
 	    JAVA_DIRS+=( ${MAINS[${#MAINS[@]}-2]})
 	    #NEW_LANGUAGE_ADD_GOES_HERE_1
-	elif [ ${LANG_DIRS[i]} == "cobolprogs" ]
+	elif [ ${LANG_DIRS[i]} == "cobol" ]
 	then
 	    COBOL_MAINS+=( ${MAINS[${#MAINS[@]}-1]%.*})
 	    COBOL_DIRS+=( ${MAINS[${#MAINS[@]}-2]})
-	elif [ ${LANG_DIRS[i]} == "fortranprogs" ]
+	elif [ ${LANG_DIRS[i]} == "fortran" ]
 	then
 	    FORTRAN_MAINS+=( ${MAINS[${#MAINS[@]}-1]%.*})
 	    FORTRAN_DIRS+=( ${MAINS[${#MAINS[@]}-2]})
-	elif [ ${LANG_DIRS[i]} == "cprogs" ]
+	elif [ ${LANG_DIRS[i]} == "c" ]
 	then
 	    C_MAINS+=( ${MAINS[${#MAINS[@]}-1]%.*})
 	    C_DIRS+=( ${MAINS[${#MAINS[@]}-2]})
@@ -118,14 +122,14 @@ for LANGS in "${LANG_DIRS[@]}"
 do
     rm -rf ~"${ABOVE_DIR}""${PROG}"/"${LANGS}"/"${GEN_FILENAME}"
     echo ~"${ABOVE_DIR}""${PROG}"/"${LANGS}"/"${GEN_FILENAME}"
-    if [ ${LANGS} == "c++progs" ]
+    if [ ${LANGS} == "cplusplus" ]
     then
 	for PROGS in "${CPLUSPLUS_DIRS[@]}"
 	do
 	    rm -rf ~"${ABOVE_DIR}""${PROG}"/"${LANGS}"/"${PROGS}"/"${GEN_FILENAME}"
 	    echo ~"${ABOVE_DIR}""${PROG}"/"${LANGS}"/"${PROGS}"/"${GEN_FILENAME}"
 	done
-    elif [ ${LANGS} == "javaprogs"  ]
+    elif [ ${LANGS} == "java"  ]
     then
 	for PROGS in "${JAVA_DIRS[@]}"
 	do
@@ -133,21 +137,21 @@ do
 	    echo ~"${ABOVE_DIR}""${PROG}"/"${LANGS}"/"${PROGS}"/"${GEN_FILENAME}"
 	done
 	#NEW_LANGUAGE_ADD_GOES_HERE_2
-    elif [ ${LANGS} == "cobolprogs" ]
+    elif [ ${LANGS} == "cobol" ]
     then
 	for PROGS in "${COBOL_DIRS[@]}"
 	do
 	    rm -rf ~"${ABOVE_DIR}${PROG}"/"${LANGS}"/"${PROGS}"/"${GEN_FILENAME}"
 	    echo ~"${ABOVE_DIR}${PROG}"/"${LANGS}"/"${PROGS}"/"${GEN_FILENAME}"
 	done
-    elif [ ${LANGS} == "fortranprogs" ]
+    elif [ ${LANGS} == "fortran" ]
     then
 	for PROGS in "${FORTRAN_DIRS[@]}"
 	do
 	    rm -rf ~"${ABOVE_DIR}${PROG}"/"${LANGS}"/"${PROGS}"/"${GEN_FILENAME}"
 	    echo ~"${ABOVE_DIR}${PROG}"/"${LANGS}"/"${PROGS}"/"${GEN_FILENAME}"
 	done
-    elif [ ${LANGS} == "cprogs" ]
+    elif [ ${LANGS} == "c" ]
     then
 	for PROGS in "${C_DIRS[@]}"
 	do
@@ -190,25 +194,24 @@ done
 
 
 
-
 #MAKEFILE in the different LANGUAGES Directories (c++progs javaprogs etc)
 for DIR in "${LANG_DIRS[@]}"
 do
     #Add new different types of language directories here!
-    if [ "${DIR}" == "c++progs" ]
+    if [ "${DIR}" == "cplusplus" ]
     then
 	echo -e "SUBDIRS = ${CPLUSPLUS_DIRS[@]}" > ${DIR}/${GEN_FILENAME}
-    elif [ "${DIR}" == "javaprogs" ]
+    elif [ "${DIR}" == "java" ]
     then
 	echo -e "SUBDIRS = ${JAVA_DIRS[@]}" > ${DIR}/${GEN_FILENAME}
 	#NEW_LANGUAGE_ADD_GOES_HERE_3
-    elif [ "${DIR}" == "cobolprogs" ]
+    elif [ "${DIR}" == "cobol" ]
     then
 	echo -e "SUBDIRS = ${COBOL_DIRS[@]}" > ${DIR}/${GEN_FILENAME}
-    elif [ "${DIR}" == "fortranprogs" ]
+    elif [ "${DIR}" == "fortran" ]
     then
 	echo -e "SUBDIRS = ${FORTRAN_DIRS[@]}" > ${DIR}/${GEN_FILENAME}
-    elif [ "${DIR}" == "cprogs" ]
+    elif [ "${DIR}" == "c" ]
     then
 	echo -e "SUBDIRS = ${C_DIRS[@]}" > ${DIR}/${GEN_FILENAME}
     fi
@@ -237,10 +240,8 @@ done
 
 
 
-
-./.config_cobolprogs "${COBOL_DIRS[@]}" 0 "${COBOL_MAINS[@]}" 0 "${GEN_FILENAME[@]}" 0 
 ./.config_cprogs "${C_DIRS[@]}" 0 "${C_MAINS[@]}" 0 "${GEN_FILENAME[@]}" 0 
 ./.config_cplusplusprogs "${CPLUSPLUS_DIRS[@]}" 0 "${CPLUSPLUS_MAINS[@]}" 0 "${GEN_FILENAME[@]}" 0 
 ./.config_fortranprogs "${FORTRAN_DIRS[@]}" 0 "${FORTRAN_MAINS[@]}" 0 "${GEN_FILENAME[@]}" 0 
 ./.config_javaprogs "${JAVA_DIRS[@]}" 0 "${JAVA_MAINS[@]}" 0 "${GEN_FILENAME[@]}" 0 
-
+./.config_cobolprogs "${COBOL_DIRS[@]}" 0  "${COBOL_MAINS[@]}" 0 "${GEN_FILENAME[@]}" 0 

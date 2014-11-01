@@ -7,18 +7,17 @@ read -p "Flags for the compiler (i.e. -o for C/C++ Progs): " FLAGS
 read -p "Extension for the type of files (i.e. cpp for C++ ) (include dot): " EXTEN
 
 
-
-
 FILE_APPENDED=config_makefiles
 TEMP_FILE=config_makefiles1
 UPPER_LANG=`echo ${LANG} | tr [a-z] [A-Z]`
 LOWER_LANG=`echo ${LANG} | tr [A-Z] [a-z]`
+NEW_CONFIG_FILE=.config_"${LOWER_LANG}"
 
-mkdir "${LOWER_LANG}""progs"
+mkdir "${LOWER_LANG}"
 
 #Add first pattern
 PATTERN_1='#NEW_LANGUAGE_ADD_GOES_HERE_1'
-echo -e "\telif [ \${LANG_DIRS[i]} == \"${LOWER_LANG}progs\" ]
+echo -e "\telif [ \${LANG_DIRS[i]} == \"${LOWER_LANG}\" ]
 \tthen
 \t    "${UPPER_LANG}"_MAINS+=( \${MAINS[\${#MAINS[@]}-1]%.*})
 \t    "${UPPER_LANG}"_DIRS+=( \${MAINS[\${#MAINS[@]}-2]})" > TEXT_INSERT
@@ -34,7 +33,7 @@ rm ${TEMP_FILE}
 
 #Add second pattern
 PATTERN_2='#NEW_LANGUAGE_ADD_GOES_HERE_2'
-echo -e "    elif [ \${LANGS} == \"${LOWER_LANG}progs\" ]
+echo -e "    elif [ \${LANGS} == \"${LOWER_LANG}\" ]
     then
 \tfor PROGS in \"\${"${UPPER_LANG}"_DIRS[@]}\"
 \tdo
@@ -52,7 +51,7 @@ rm ${TEMP_FILE}
 
 #Add third pattern
 PATTERN_3='#NEW_LANGUAGE_ADD_GOES_HERE_3'
-echo -e "    elif [ \"\${DIR}\" == \"${LOWER_LANG}progs\" ]
+echo -e "    elif [ \"\${DIR}\" == \"${LOWER_LANG}\" ]
     then
 	echo -e \"SUBDIRS = \${"${UPPER_LANG}"_DIRS[@]}\" > \${DIR}/\${GEN_FILENAME}" > TEXT_INSERT
 sed -e "/${PATTERN_3}/r TEXT_INSERT" "${FILE_APPENDED}" >> ${TEMP_FILE}
@@ -60,10 +59,43 @@ cat ${TEMP_FILE} > ${FILE_APPENDED}
 rm ${TEMP_FILE}
 
 
+echo -e "#!/bin/bash
+
+EVERYTHING=("\"\$@\"")
+"${UPPER_LANG}"_DIRS=()
+"${UPPER_LANG}"_MAINS=()
+GEN_FILENAME=()
+COUNTER=0
+
+for (( i=0; i<\""\${#EVERYTHING[@]}\""; i++ ))
+do
+	if [[ \""\${EVERYTHING[\$""{i}]}\"" != 0 && \""\${COUNTER}\"" == 0 ]]
+	then
+		"${UPPER_LANG}"_DIRS+=(\""\${EVERYTHING[\$""{i}]}\"")
+	elif [[ \""\${EVERYTHING[\$""{i}]}\"" != 0 && \""\${COUNTER}\"" == 1 ]]
+	then
+		"${UPPER_LANG}"_MAINS+=(\""\${EVERYTHING[\$""{i}]}\"")
+	
+	elif [[ \""\${EVERYTHING[\$""{i}]}\"" != 0 && \""\${COUNTER}\"" == 2 ]]
+	then
+		GEN_FILENAME+=(\""\${EVERYTHING[\$""{i}]}\"")
+	fi
+	if [[ \""\${EVERYTHING[\$""{i}]}\"" == 0 ]]
+	then	
+		COUNTER=\$""((COUNTER+1))
+	fi
+done" > TEXT_INSERT
+cat TEXT_INSERT > ${NEW_CONFIG_FILE}
+rm -r TEXT_INSERT
+
+
+
+
+
 
 
 #Create appriopriate Makefile skeleton that will be used to generate the actual Makefiles for that language
-echo -e "\n\n\n\n\n\n\n#MAKEFILE structure for "${UPPER_LANG}" Programs
+echo -e "\n\n#MAKEFILE structure for "${UPPER_LANG}" Programs
 for DIR in \"\${"${UPPER_LANG}"_DIRS[@]}\"
 do
     for (( i=0; i<\"\${#"${UPPER_LANG}"_DIRS[@]}\"; i++ ))
@@ -72,7 +104,7 @@ do
 	then
             echo -e \"COMPILE = "${COMPILER}"
 DEPEND = "${FLAGS}"
-MAIN = \${"${UPPER_LANG}"_MAINS[\$i]}\" > "\"${LOWER_LANG}"progs\"/\${DIR}/\${GEN_FILENAME}
+MAIN = \${"${UPPER_LANG}"_MAINS[\$i]}\" > "\"${LOWER_LANG}"\"/\${DIR}/\${GEN_FILENAME}
         fi
     done
 
@@ -88,17 +120,32 @@ run:
 
 distclean:
 \trm -r -f \\$\"\"{MAIN}
-\trm -r -f \"\${GEN_FILENAME}\"\" >> \""${LOWER_LANG}"progs\"/\${DIR}/\${GEN_FILENAME}
+\trm -r -f \"\${GEN_FILENAME}\"\" >> \""${LOWER_LANG}"\"/\${DIR}/\${GEN_FILENAME}
 done
 " > TEXT_INSERT
-cat TEXT_INSERT >> ${FILE_APPENDED}
-
-
+cat TEXT_INSERT >> ${NEW_CONFIG_FILE}
 rm -r TEXT_INSERT
 
+chmod u+x ${NEW_CONFIG_FILE}
+
+#Call the newly created .config_"lang"prog script from our main config_makefiles script.
+echo -e "./.config_"${LOWER_LANG} \""\${"${UPPER_LANG}"_DIRS[@]}\" 0 " \""\${"${UPPER_LANG}"_MAINS[@]}\" 0 \"\${GEN_FILENAME[@]}\" 0 " >> ${FILE_APPENDED}
 
 
-#Obtaiin array of compiler languages
+
+
+
+
+
+
+
+
+
+
+
+
+
+#Obtain array of compiler languages
 COMPILER_CHECKS=`grep "COMPILER_CHECK=" "${FILE_APPENDED}"`
 #Add the new language to the compiler languages array
 COMPILER_CHECKS=$(echo ${COMPILER_CHECKS:0:${#COMPILER_CHECKS}-1} "${COMPILER})")
@@ -135,7 +182,7 @@ EXTENSION_CHECKS=`grep "EXT_LANGS=" "${FILE_APPENDED}"`
 #Add the new extension to the extension language array
 EXTENSION_CHECKS=$(echo ${EXTENSION_CHECKS:0:${#EXTENSION_CHECKS}-1} "${EXTEN})")
 
-#Find the line number to write to and write the new array to the config file.
+#Find the line number to write to and write the new array to the config_makefiles file.
 IFS=':' LINE_NUM=(`grep -n "EXT_LANGS=" ${FILE_APPENDED}`)
 
 sed "${LINE_NUM[0]}d" ${FILE_APPENDED} > ${TEMP_FILE}
@@ -148,5 +195,5 @@ cat ${TEMP_FILE} > ${FILE_APPENDED}
 rm ${TEMP_FILE}
 
 echo ""
-echo "${LOWER_LANG}""progs/ directory has been created. "
+echo "${LOWER_LANG}""/ directory has been created. "
 echo "Move your projects into that directory and run the config_makefiles script."

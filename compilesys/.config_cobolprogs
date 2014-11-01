@@ -26,7 +26,6 @@ do
 done
 
 
-
 #MAKEFILE structure for COBOL Programs
 for DIR in "${COBOL_DIRS[@]}"
 do
@@ -35,13 +34,13 @@ do
 	if [ "${DIR}" == "${COBOL_DIRS[${i}]}" ]
 	then
             echo -e "COMPILE = cobc
-DEPEND = -x
-MAIN = ${COBOL_MAINS[$i]}" > "cobolprogs"/${DIR}/${GEN_FILENAME}
+DEPEND = -x -o
+MAIN = ${COBOL_MAINS[$i]}" > "cobol"/${DIR}/${GEN_FILENAME}
         fi
     done
 
 echo -e "all:
-	\$""{COMPILE} \$""{DEPEND} \$""{MAIN}.cob
+	\$""{COMPILE} \$""{MAIN}.cob \$""{DEPEND} \$""{MAIN}
 
 clean:
 	rm -f \$""{MAIN}
@@ -52,5 +51,6 @@ run:
 
 distclean:
 	rm -r -f \$""{MAIN}
-	rm -r -f "${GEN_FILENAME}"" >> "cobolprogs"/${DIR}/${GEN_FILENAME}
+	rm -r -f "${GEN_FILENAME}"" >> "cobol"/${DIR}/${GEN_FILENAME}
 done
+
