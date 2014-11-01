@@ -18,7 +18,8 @@ How to use this compilation system:
 
 3) Output will check if specific compilers exist or not.
 
-4) Makefiles will be generated for the supported languages. (You must have 'make' installed on your system to run any of the afformentioned generated Makefiles, if you do not have 'make' installed, an command not found error will be thrown).
+4) Makefiles will be generated for the supported languages. You must have 'make' installed on your system to run any of the afformentioned generated Makefiles, if you do not have 'make' installed, a "command not found error will be thrown". 
+You can install 'make' by typing 'sudo apt-get install make'
 
 5) 'make' command will compile current and lower directory programs 'make run' will run existing directory program for the supported languages 'make clean' will delete current and lower executable files for all supported languages 'make distclean' will perform 'make clean' functions as well as delete all current and lower Makefiles.
 
