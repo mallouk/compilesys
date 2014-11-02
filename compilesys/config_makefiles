@@ -12,9 +12,9 @@ fi
 
 #Add new languages and compiler commands here to check for new ones.
 echo "Checking for existing compilers..."
-COMPILER_CHECK=(make javac g++ python gcc f77 cobc)
-LANG_CHECK=(Make Java C++ Python C Fortran Cobol)
-EXT_LANGS=(.java .cpp .c .f .cob)
+COMPILER_CHECK=( make javac g++ gcc f77 cobc )
+LANG_CHECK=( Make Java C++ C Fortran Cobol )
+EXT_LANGS=( .java .cpp .c .f .cob )
 
 #Sort extension languages Function
 function mysortLangExt { 
@@ -89,7 +89,11 @@ do
         #Add LANGUAGENAME_DIRS as an elif statement to support the language.
         #Also build a Makefile structure at the bottom of the file to support the language.
 	IFS='/' MAINS=(${DIR_ARRAY[n]})
-	if [ ${LANG_DIRS[i]} == "cplusplus" ]
+	if [ ${LANG_DIRS[i]} == "" ]
+	then
+		#Do Nothing
+		:
+	elif [ ${LANG_DIRS[i]} == "cplusplus" ]
 	then
 	    CPLUSPLUS_MAINS+=( ${MAINS[${#MAINS[@]}-1]%.*})
 	    CPLUSPLUS_DIRS+=( ${MAINS[${#MAINS[@]}-2]})
@@ -122,7 +126,12 @@ for LANGS in "${LANG_DIRS[@]}"
 do
     rm -rf ~"${ABOVE_DIR}""${PROG}"/"${LANGS}"/"${GEN_FILENAME}"
     echo ~"${ABOVE_DIR}""${PROG}"/"${LANGS}"/"${GEN_FILENAME}"
-    if [ ${LANGS} == "cplusplus" ]
+
+    if [ ${LANGS} == "" ]
+    then
+	#Do Nothing
+	:
+    elif [ ${LANGS} == "cplusplus" ]
     then
 	for PROGS in "${CPLUSPLUS_DIRS[@]}"
 	do
@@ -198,7 +207,11 @@ done
 for DIR in "${LANG_DIRS[@]}"
 do
     #Add new different types of language directories here!
-    if [ "${DIR}" == "cplusplus" ]
+    if [ "${DIR}" == "" ]
+    then
+	#Do Nothing
+	:
+    elif [ "${DIR}" == "cplusplus" ]
     then
 	echo -e "SUBDIRS = ${CPLUSPLUS_DIRS[@]}" > ${DIR}/${GEN_FILENAME}
     elif [ "${DIR}" == "java" ]

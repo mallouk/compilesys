@@ -1,0 +1,49 @@
+#!/bin/bash
+
+cat config_makefiles > config_makefiles1
+
+read -p "Name of language you wish to unsupport: " LANG
+MAIN_SCRIPT=config_makefiles1
+LOWER_LANG=`echo ${LANG} | tr [:upper:] [:lower:]`
+
+
+#IFS=':' LANG_LINE=( `grep -n 'LANG_CHECK=(' ${MAIN_SCRIPT}` )
+
+#IFS=' ' LANGS=( `sed -n "${LANG_LINE}p" ${MAIN_SCRIPT}` )
+
+#Force case insenitive comparisons
+shopt -s nocasematch
+
+#for (( i=1; i<"${#LANGS[@]}"-1; i++ ))
+#do
+#	if [[ "${LANGS[${i}]}" != "${LANG}" ]]
+#	then
+#		LANG_CHECK+=( "${LANGS[${i}]}" )
+#	else
+		#This special counter will help us remove the other specific elements in the other array patterns
+#		SPECIAL_COUNTER=${i}		
+#	fi
+#done
+
+#sed -i '${LANG_LINE}s/.*/replacement-line/' ${MAIN_SCRIPT}
+
+
+
+
+#Find the various conditionals regarding the particular language we want to remove
+#Find out line number of where we want to stop removing
+#Remove the lines from one point to the other for all types of patterns found
+IFS=':' PATTERN4_BEGIN=( `grep -n 'elif \[ \${LANG_DIRS' ${MAIN_SCRIPT} | grep "${LOWER_LANG}"` )
+PATTERN4_END=$(( ${PATTERN4_BEGIN[0]} + 3 ))
+sed "${PATTERN4_BEGIN}"",""${PATTERN4_END}d" ${MAIN_SCRIPT} > ${MAIN_SCRIPT}
+
+echo "${PATTERN4_BEGIN}"
+
+IFS=':' PATTERN5_BEGIN=( `grep -n 'elif \[ \${LANGS' ${MAIN_SCRIPT} | grep "${LOWER_LANG}"` )
+PATTERN5_END=$(( ${PATTERN5_BEGIN[0]} + 6 ))
+sed "${PATTERN5_BEGIN}"",""${PATTERN5_END}d" ${MAIN_SCRIPT} > ${MAIN_SCRIPT}
+
+
+IFS=':' PATTERN6_BEGIN=( `grep -n 'elif \[ \"\${DIR' ${MAIN_SCRIPT} | grep "${LOWER_LANG}"` )
+PATTERN6_END=$(( ${PATTERN6_BEGIN[0]} + 2 ))
+sed "${PATTERN6_BEGIN}"",""${PATTERN6_END}d" ${MAIN_SCRIPT} > ${MAIN_SCRIPT}
