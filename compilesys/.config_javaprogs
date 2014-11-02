@@ -29,16 +29,18 @@ done
 #MAKEFILE structure for JAVA Programs
 for DIR in "${JAVA_DIRS[@]}"
 do 
+echo -e "COMPILE = javac
+DEPEND = -d
+CLASS_DIR = classes" > "java"/${DIR}/${GEN_FILENAME}
+echo -ne "MAIN = " >> "java"/${DIR}/${GEN_FILENAME}
     for ((x=0; x<"${#JAVA_DIRS[@]}"; x++))
     do
 	if [ "${DIR}" == "${JAVA_DIRS[$x]}" ]
-	    then
-	    echo -e "COMPILE = javac
-DEPEND = -d
-CLASS_DIR = classes
-MAIN = ${JAVA_MAINS[$x]}" > "java"/${DIR}/${GEN_FILENAME}
+	then
+	    echo -ne "${JAVA_MAINS[$x]}" >> "java"/${DIR}/${GEN_FILENAME}
 	fi
     done
+echo -e "" >> "java"/${DIR}/${GEN_FILENAME}
 echo -e "all:
 	mkdir -p \$""{CLASS_DIR}
 	\$""{COMPILE} \$""{DEPEND} \$""{CLASS_DIR} \$""{MAIN}.java

@@ -79,7 +79,6 @@ done
 
 for ((i=0; i<"${#LANG_DIRS[@]}"; i++))
 do
-
     #THE VARIOUS LANGUAGES MUST HAVE THE WORD 'MAIN' IN THEM TO HAVE THE MAKEFILES SHOW UP IN THEIR DIRECTORIES
     IFS='
 ' DIR_ARRAY=(`grep '' ${LANG_DIRS[i]} -lR | grep ${LANGS_EXTENSIONS[i]}`)
@@ -99,8 +98,14 @@ do
 	    CPLUSPLUS_DIRS+=( ${MAINS[${#MAINS[@]}-2]})
 	elif [ ${LANG_DIRS[i]} == "java" ]
 	then
-	    JAVA_MAINS+=(${MAINS[${#MAINS[@]}-1]%.*})
-	    JAVA_DIRS+=( ${MAINS[${#MAINS[@]}-2]})
+	    VARTEST=( `grep 'public static void main' "${DIR_ARRAY[${n}]}" ` )
+	    if [[ ${VARTEST} != "" ]]
+	    then
+	    	JAVA_MAINS+=(${MAINS[${#MAINS[@]}-1]%.*})
+		JAVA_DIRS+=( ${MAINS[${#MAINS[@]}-2]})
+	    fi
+	    
+
 	    #NEW_LANGUAGE_ADD_GOES_HERE_1
 	elif [ ${LANG_DIRS[i]} == "cobol" ]
 	then
@@ -117,6 +122,7 @@ do
 	fi
     done
 done
+
 
 echo "Generating Makefiles...."
 
