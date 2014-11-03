@@ -2,7 +2,7 @@
 
 #Relevant Prompts
 read -p "Name of language to add/support: " LANG
-read -p "Compiler name of language (i.e. javac for Java): " COMPILER
+read -p "Compiler compile command (i.e. javac for Java/cobc for Cobol): " COMPILER
 read -p "Flags for the compiler (i.e. -o for C/C++ Progs): " FLAGS
 read -p "Extension for the type of files (i.e. cpp for C++ ) (include dot): " EXTEN
 
