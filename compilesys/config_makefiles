@@ -13,7 +13,7 @@ fi
 #Add new languages and compiler commands here to check for new ones.
 echo "Checking for existing compilers..."
 COMPILER_CHECK=( make javac g++ gcc f77 cobc )
-LANG_CHECK=( Make Java C++ C Fortran Cobol )
+LANG_CHECK=( Make Java C++ C Fortran77 Cobol )
 EXT_LANGS=( .java .cpp .c .f .cob )
 
 #Sort extension languages Function
@@ -39,7 +39,7 @@ do
     echo -n  "${LANG_CHECK[${i}]}..."
     if [[ ${COMPILE} == */usr/bin/* ]]
     then
-	echo "Yes"
+	echo "Yes" " (" "${COMPILER_CHECK[${i}]}" ")"
     else
 	echo "No"
     fi
@@ -94,12 +94,16 @@ do
 		:
 	elif [ ${LANG_DIRS[i]} == "cplusplus" ]
 	then
-	    CPLUSPLUS_MAINS+=( ${MAINS[${#MAINS[@]}-1]%.*})
-	    CPLUSPLUS_DIRS+=( ${MAINS[${#MAINS[@]}-2]})
+	    FINDMAIN=( `grep '.*main(.*)' "${DIR_ARRAY[${n}]}" ` )
+	    if [[ ${FINDMAIN} != "" ]]
+	    then
+	    	CPLUSPLUS_MAINS+=( ${MAINS[${#MAINS[@]}-1]%.*})
+	    	CPLUSPLUS_DIRS+=( ${MAINS[${#MAINS[@]}-2]})
+	    fi
 	elif [ ${LANG_DIRS[i]} == "java" ]
 	then
-	    VARTEST=( `grep 'public static void main' "${DIR_ARRAY[${n}]}" ` )
-	    if [[ ${VARTEST} != "" ]]
+	    FINDMAIN=( `grep 'public static void main' "${DIR_ARRAY[${n}]}" ` )
+	    if [[ ${FINDMAIN} != "" ]]
 	    then
 	    	JAVA_MAINS+=(${MAINS[${#MAINS[@]}-1]%.*})
 		JAVA_DIRS+=( ${MAINS[${#MAINS[@]}-2]})
@@ -109,14 +113,14 @@ do
 	then
 	    COBOL_MAINS+=( ${MAINS[${#MAINS[@]}-1]%.*})
 	    COBOL_DIRS+=( ${MAINS[${#MAINS[@]}-2]})
-	elif [ ${LANG_DIRS[i]} == "fortran" ]
+	elif [ ${LANG_DIRS[i]} == "fortran77" ]
 	then
 	    FORTRAN_MAINS+=( ${MAINS[${#MAINS[@]}-1]%.*})
 	    FORTRAN_DIRS+=( ${MAINS[${#MAINS[@]}-2]})
 	elif [ ${LANG_DIRS[i]} == "c" ]
 	then
-	    VARTEST=( `grep '.*main(.*)' "${DIR_ARRAY[${n}]}" ` )
-	    if [[ ${VARTEST} != "" ]]
+	    FINDMAIN=( `grep '.*main(.*)' "${DIR_ARRAY[${n}]}" ` )
+	    if [[ ${FINDMAIN} != "" ]]
 	    then
 		C_MAINS+=( ${MAINS[${#MAINS[@]}-1]%.*})
 	    	C_DIRS+=( ${MAINS[${#MAINS[@]}-2]})
@@ -161,7 +165,7 @@ do
 	    rm -rf ~"${ABOVE_DIR}${PROG}"/"${LANGS}"/"${PROGS}"/"${GEN_FILENAME}"
 	    echo ~"${ABOVE_DIR}${PROG}"/"${LANGS}"/"${PROGS}"/"${GEN_FILENAME}"
 	done
-    elif [ ${LANGS} == "fortran" ]
+    elif [ ${LANGS} == "fortran77" ]
     then
 	for PROGS in "${FORTRAN_DIRS[@]}"
 	do
@@ -229,7 +233,7 @@ do
     elif [ "${DIR}" == "cobol" ]
     then
 	echo -e "SUBDIRS = ${COBOL_DIRS[@]}" > ${DIR}/${GEN_FILENAME}
-    elif [ "${DIR}" == "fortran" ]
+    elif [ "${DIR}" == "fortran77" ]
     then
 	echo -e "SUBDIRS = ${FORTRAN_DIRS[@]}" > ${DIR}/${GEN_FILENAME}
     elif [ "${DIR}" == "c" ]

@@ -36,13 +36,13 @@ do
 	then
 	    echo -e "COMPILE = g++
 DEPEND = -o
-
+SRC = *
 MAIN = ${CPLUSPLUS_MAINS[$i]}" > "cplusplus"/${DIR}/${GEN_FILENAME}
 	fi
     done
 
 echo -e "all:
-	\$""{COMPILE} \$""{MAIN}.cpp \$""{DEPEND} \$""{MAIN}
+	\$""{COMPILE} *.cpp \$""{DEPEND} \$""{MAIN}
 
 clean:
 	rm -f \$""{MAIN}

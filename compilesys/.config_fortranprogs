@@ -35,7 +35,7 @@ do
 	then
             echo -e "COMPILE = f77
 DEPEND = -o
-MAIN = ${FORTRAN_MAINS[$i]}" > "fortran"/${DIR}/${GEN_FILENAME}
+MAIN = ${FORTRAN_MAINS[$i]}" > "fortran77"/${DIR}/${GEN_FILENAME}
         fi
     done
 
@@ -51,5 +51,5 @@ run:
 
 distclean:
 	rm -r -f \$""{MAIN}
-	rm -r -f "${GEN_FILENAME}"" >> "fortran"/${DIR}/${GEN_FILENAME}
+	rm -r -f "${GEN_FILENAME}"" >> "fortran77"/${DIR}/${GEN_FILENAME}
 done
