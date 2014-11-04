@@ -1,30 +1,30 @@
-This is the MultiCompile system (MCS). It is good for compiling a wide variety of programs across a large specturm of languages. The script in this respoistory creates a series of Makefiles for specifically supported languages (currently only supports Fortran77, Cobol, C, C++, and Java).
+This is the MultiCompile System (MCS). It is good for compiling a wide variety of programs across a large specturm of languages. The main script (config_makefiles) in this respoistory creates a series of Makefiles for specifically supported languages (currently it only supports Fortran77, Cobol, C, C++, and Java).
 
 It is very easily extendible in terms of adding extra languages to support, adding support for other languages requires only to run the support_new_languages script as well as to input the appriopriate answers to the script's questions.
 
-The questions that the support_new_languages script will ask will require the user to know 4 things in this order:
+The questions that the support_new_languages script asks will require the user to know 4 things in this order:
 1) Name of language to support
 2) The compiler command for said language (i.e. javac for Java/cobc for Cobol)
 3) Any particular flags for the compiler (such as -o for C/C++)
 4) Extension for the type of flies (i.e. .cpp for C++ files or .java for Java)
 
-This program will check for specific existing compilers for a variety of languages and tell the user if those appropriate compilers exist or not. Then the program will generate the appropriate Makefiles for the current and lower directories.
+This program will check for specific existing compilers for a variety of languages and tell the user if those compilers exist or not. Then the program will generate the appropriate Makefiles for the current and lower directories.
 
 How to use this compilation system:
 
-1) Clone the repository using the 'git clone' command or download a zip from this page to the right portion of your screen.
+1) Clone the repository using the 'git clone' command or download a zip file from this page.
 
-2) Once the repository is in a suitable directory, you can execute the script by this command: ./config_makefiles
+2) Once the repository is in a suitable directory, you can 'cd' into the directory where you placed this. Then you can execute the script by this command: ./config_makefiles
 
-3) Output will check if specific compilers exist or not.
+3) The config_makefiles script will check if specific compilers exist or not and output appropriately.
 
 4) Makefiles will be generated for the supported languages. You must have 'make' installed on your system to run any of the afformentioned generated Makefiles, if you do not have 'make' installed, a "command not found error will be thrown". 
 You can install 'make' by typing 'sudo apt-get install make' or using whatever package manager you have.
 
 5) The 'make' command will compile current and lower directory programs.
-   The 'make run' command will run existing directory program for the supported languages.
-   The 'make clean' command will delete current and lower executable files for all supported languages.
-   The 'make distclean' command will perform 'make clean' functions as well as delete all the current and lower directory Makefiles.
+   The 'make run' command will run the existing current directory program for the supported languages.
+   The 'make clean' command will delete the current and lower executable files for all supported languages.
+   The 'make distclean' command will perform the 'make clean' functions, as well as, delete all the current and lower directory Makefiles.
 
 NOTE: THE DIRECTORIES THAT HOLD THE LANGUAGE SPECIFIC PROGRAMS MUST NOT BE CHANGED. (aka the java/ c/ and cplusplus/ directories must not be modified in name)
 
