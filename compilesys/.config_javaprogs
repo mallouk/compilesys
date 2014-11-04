@@ -31,7 +31,8 @@ for DIR in "${JAVA_DIRS[@]}"
 do 
 echo -e "COMPILE = javac
 DEPEND = -d
-CLASS_DIR = classes" > "java"/${DIR}/${GEN_FILENAME}
+CLASS_DIR = classes
+SRC = *" > "java"/${DIR}/${GEN_FILENAME}
 echo -ne "MAIN = " >> "java"/${DIR}/${GEN_FILENAME}
     for ((x=0; x<"${#JAVA_DIRS[@]}"; x++))
     do
@@ -43,7 +44,7 @@ echo -ne "MAIN = " >> "java"/${DIR}/${GEN_FILENAME}
 echo -e "" >> "java"/${DIR}/${GEN_FILENAME}
 echo -e "all:
 	mkdir -p \$""{CLASS_DIR}
-	\$""{COMPILE} \$""{DEPEND} \$""{CLASS_DIR} \$""{MAIN}.java
+	\$""{COMPILE} \$""{DEPEND} \$""{CLASS_DIR} *.java
 
 clean:
 	rm -r -f \$""{CLASS_DIR}

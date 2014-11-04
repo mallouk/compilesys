@@ -104,8 +104,6 @@ do
 	    	JAVA_MAINS+=(${MAINS[${#MAINS[@]}-1]%.*})
 		JAVA_DIRS+=( ${MAINS[${#MAINS[@]}-2]})
 	    fi
-	    
-
 	    #NEW_LANGUAGE_ADD_GOES_HERE_1
 	elif [ ${LANG_DIRS[i]} == "cobol" ]
 	then
@@ -117,8 +115,12 @@ do
 	    FORTRAN_DIRS+=( ${MAINS[${#MAINS[@]}-2]})
 	elif [ ${LANG_DIRS[i]} == "c" ]
 	then
-	    C_MAINS+=( ${MAINS[${#MAINS[@]}-1]%.*})
-	    C_DIRS+=( ${MAINS[${#MAINS[@]}-2]})
+	    VARTEST=( `grep '.*main(.*)' "${DIR_ARRAY[${n}]}" ` )
+	    if [[ ${VARTEST} != "" ]]
+	    then
+		C_MAINS+=( ${MAINS[${#MAINS[@]}-1]%.*})
+	    	C_DIRS+=( ${MAINS[${#MAINS[@]}-2]})
+	    fi
 	fi
     done
 done
@@ -259,7 +261,7 @@ done
 
 
 
-./.config_cprogs "${C_DIRS[@]}" 0 "${C_MAINS[@]}" 0 "${GEN_FILENAME[@]}" 0 
+./.config_cprogs "${C_DIRS[@]}" 0 "${C_MAINS[@]}" 0 "${GEN_FILENAME[@]}" 0 "${C_SRC[@]}" 0
 ./.config_cplusplusprogs "${CPLUSPLUS_DIRS[@]}" 0 "${CPLUSPLUS_MAINS[@]}" 0 "${GEN_FILENAME[@]}" 0 
 ./.config_fortranprogs "${FORTRAN_DIRS[@]}" 0 "${FORTRAN_MAINS[@]}" 0 "${GEN_FILENAME[@]}" 0 
 ./.config_javaprogs "${JAVA_DIRS[@]}" 0 "${JAVA_MAINS[@]}" 0 "${GEN_FILENAME[@]}" 0 

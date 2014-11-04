@@ -25,6 +25,8 @@ do
 	fi
 done
 
+echo "${#C_DIRS[@]}"
+
 
 #MAKEFILE structure for C Programs
 for DIR in "${C_DIRS[@]}"
@@ -35,12 +37,13 @@ do
 	then
             echo -e "COMPILE = gcc
 DEPEND = -o
+SRC = *
 MAIN = ${C_MAINS[$i]}" > "c"/${DIR}/${GEN_FILENAME}
         fi
     done
 
 echo -e "all:
-	\$""{COMPILE} \$""{MAIN}.c \$""{DEPEND} \$""{MAIN}
+	\$""{COMPILE} *.c \$""{DEPEND} \$""{MAIN}
 
 clean:
 	rm -f \$""{MAIN}
