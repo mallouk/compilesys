@@ -69,11 +69,8 @@ IFS='
 ' DIR_ARRAY=(`ls -l | grep '^d'`)
 for ((n=0; n<"${#DIR_ARRAY[@]}"; n++))
 do
-    IFS=' ' DIRECT=(${DIR_ARRAY[n]})
-    if [ "${DIRECT[${#DIRECT[@]}-1]}" != "python" ]
-    then
+	IFS=' ' DIRECT=(${DIR_ARRAY[n]})
 	LANG_DIRS+=(${DIRECT[${#DIRECT[@]}-1]})
-    fi
 done
 
 
