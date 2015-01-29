@@ -28,6 +28,4 @@ You can install 'make' by typing 'sudo apt-get install make' or using whatever p
 
 NOTE: THE DIRECTORIES THAT HOLD THE LANGUAGE SPECIFIC PROGRAMS MUST NOT BE CHANGED. (aka the java/ c/ and cplusplus/ directories must not be modified in name)
 
-The example programs of java and c/c++ are just little test examples for helping test the boundaries of the compile script. In terms of adding your own new code. Simply create a new directory in the appropriate languages folder and places your source files in your newly created directory. All you need to do at that point is just run the config_makesfiles script.
-
-   
+The example programs of java and c/c++ are just little test examples for helping test the boundaries of the compile script. In terms of adding your own new code. Simply create a new directory in the appropriate languages folder and places your source files in your newly created directory. All you need to do at that point is just run the config_makesfiles script!
