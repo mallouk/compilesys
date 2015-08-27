@@ -34,14 +34,14 @@ do
 	if [ "${DIR}" == "${C_DIRS[${i}]}" ]
 	then
             echo -e "COMPILE = gcc
-DEPEND = -o
+DEPEND = -o -g
 SRC = *
 MAIN = ${C_MAINS[$i]}" > "c"/${DIR}/${GEN_FILENAME}
         fi
     done
 
 echo -e "all:
-	\$""{COMPILE} *.c \$""{DEPEND} \$""{MAIN}
+	\$""{COMPILE} \$""{DEPEND} \$""{MAIN} \$""{MAIN}.c
 
 clean:
 	rm -f \$""{MAIN}

@@ -35,14 +35,14 @@ do
 	if [ "${DIR}" == "${CPLUSPLUS_DIRS[${i}]}" ]
 	then
 	    echo -e "COMPILE = g++
-DEPEND = -o
+DEPEND = -o -g
 SRC = *
 MAIN = ${CPLUSPLUS_MAINS[$i]}" > "cplusplus"/${DIR}/${GEN_FILENAME}
 	fi
     done
 
 echo -e "all:
-	\$""{COMPILE} *.cpp \$""{DEPEND} \$""{MAIN}
+	\$""{COMPILE} \$""{DEPEND} \$""{MAIN} \$""{MAIN}.cpp
 
 clean:
 	rm -f \$""{MAIN}
